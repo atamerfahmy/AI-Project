@@ -11,8 +11,11 @@ public class NeoState extends State {
 	ArrayList<Point> pills;
 	ArrayList<Pad> pads;
 	ArrayList<Hostage> hostages;
-
-	public NeoState(Point position, ArrayList<Hostage> carried, ArrayList<Point> agents, ArrayList<Point> pills, ArrayList<Pad> pads, ArrayList<Hostage> hostages, int damage) {
+	int killed;
+	int death;
+	Point prev;
+	
+	public NeoState(Point position, ArrayList<Hostage> carried, ArrayList<Point> agents, ArrayList<Point> pills, ArrayList<Pad> pads, ArrayList<Hostage> hostages, int damage, int killed, int death, Point prev) {
 		
 		super();
 		this.position = position;
@@ -23,7 +26,9 @@ public class NeoState extends State {
 		this.pads = pads;
 		this.hostages = hostages;
 		this.damage = damage;
-
+		this.killed = killed;
+		this.death = death;
+		this.prev = prev;
 	}
 	
 	public Point getPosition() {
@@ -34,20 +39,7 @@ public class NeoState extends State {
 		return this.position;
 	}
 	 
-	public void setDamage(int value) {
-		
-		//value is negative to increase health/decrease damage
-		if(damage + value < 0) {
-			damage = 0;
-		}
-		else if(damage + value > 100) {
-			damage = 100;
-		}
-		else {
-			damage += value;
-		}
-		
-	}
+
 	
 	public String toString()
 	{
