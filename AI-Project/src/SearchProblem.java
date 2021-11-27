@@ -1,3 +1,4 @@
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -7,6 +8,7 @@ public abstract class SearchProblem {
 	String [] operators;
 	int nodesExpanded = 0;
 	int currlevel = 0;
+		
 	Hashtable<String, String> states = new Hashtable<String, String>();
 	
 	public abstract boolean goalTest(SearchTreeNode node);
@@ -19,6 +21,7 @@ public abstract class SearchProblem {
 		for(int i =0; i<operators.length ; i++)
 		{
 			State state = transitionFunction(node.state, operators[i]);
+//			System.out.println("Here: " + state);
 			if(state !=null){
 				SearchTreeNode nodeTemp = new SearchTreeNode(state,node,operators[i],node.depth+1,state.pathCost);
 				nodes.add(nodeTemp);

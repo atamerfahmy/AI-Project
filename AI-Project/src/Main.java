@@ -9,27 +9,30 @@ public class Main {
 //		System.out.println(genGrid());
 //		System.out.println(genRandomInt(6, 5));
 		
-		String grid = genGrid();
-		String s = solve(grid,"UC",false);
+//		String grid = genGrid();
+		String grid= "5,5;2;0,4;1,4;0,1,1,1,2,1,3,1,3,3,3,4;1,0,2,4;0,3,4,3,4,3,0,3;0,0,30,3,0,80,4,4,80";
+
+		String s = solve(grid,"BF",false);
 		System.out.println(s);
 
 	}
 	
 	public static String solve(String grid, String strategy, boolean visualize) {
-		TheMatrix endgame = new TheMatrix(grid);
+		TheMatrix theMatrix = new TheMatrix(grid);
 		
-//		SearchTreeNode node = endgame.generalSearch(strategy);
+		SearchTreeNode node = theMatrix.generalSearch(strategy);
 		String result = "";
-		
-//		if(node != null){
-//			int pathcost = node.pathCost;
-//			result += "snap";
-//			while(node.parent != null){
-//				result = node.operator+"("+node.pathCost+")" +", "+ result;
-//				node = node.parent;
-//			}
-//			result +=";"+pathcost+";"+endgame.nodesExpanded;
-//		}
+//		System.out.println(node);
+
+		if(node != null){
+			int pathcost = node.pathCost;
+			result += "snap";
+			while(node.parent != null){
+				result = node.operator + ", "+ result;
+				node = node.parent;
+			}
+			result +=";"+pathcost+";"+theMatrix.nodesExpanded;
+		}
 		
 		return result;
 		
