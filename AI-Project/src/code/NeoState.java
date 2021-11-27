@@ -1,3 +1,4 @@
+package code;
 import java.awt.Point;
 import java.util.ArrayList;
 
@@ -51,26 +52,39 @@ public class NeoState extends State {
 	public String toString()
 	{
 		String value = "";
-		value += "(" + position.x + "," + position.y + ")";
-		
+		value += "(" + position.x + "," + position.y +")";
+//		value += "(" + carried.size() + "," + agents.size() + "," + pills.size() + "," + pads.size() + "," + hostages.size() + ")";
+
+		value += "(" + -1 + "," + -1 +")";
+
 		for(int i=0; i<carried.size();i++){
 			//if(positions.get(i).x == -1)
 				//value += ";";
 			value += "(" + carried.get(i).position.x + "," + carried.get(i).position.y +")";
 		}
-		
+		value += "(" + -1 + "," + -1 +")";
+
+		for(int i=0; i<hostages.size();i++){
+			//if(positions.get(i).x == -1)
+				//value += ";";
+			value += "(" + hostages.get(i).position.x + "," + hostages.get(i).position.y + ")";
+		}
+		value += "(" + -1 + "," + -1 +")";
+
 		for(int i=0; i<agents.size();i++){
 			//if(positions.get(i).x == -1)
 				//value += ";";
 			value += "(" + agents.get(i).x + "," + agents.get(i).y +")";
 		}
-		
+		value += "(" + -1 + "," + -1 +")";
+
 		for(int i=0; i<pills.size();i++){
 			//if(positions.get(i).x == -1)
 				//value += ";";
 			value += "(" + pills.get(i).x + "," + pills.get(i).y +")";
 		}
-		
+		value += "(" + -1 + "," + -1 +")";
+
 		for(int i=0; i<pads.size();i++){
 			//if(positions.get(i).x == -1)
 				//value += ";";
@@ -79,12 +93,7 @@ public class NeoState extends State {
 
 		}
 		
-		for(int i=0; i<hostages.size();i++){
-			//if(positions.get(i).x == -1)
-				//value += ";";
-			value += "(" + hostages.get(i).position.x + "," + hostages.get(i).position.y +")";
-		}
-		
+//		value +=  "(" + damage +")";
 		return value;
 	}
 

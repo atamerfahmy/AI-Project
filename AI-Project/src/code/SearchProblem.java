@@ -1,3 +1,4 @@
+package code;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -21,7 +22,6 @@ public abstract class SearchProblem {
 		for(int i =0; i<operators.length ; i++)
 		{
 			State state = transitionFunction(node.state, operators[i]);
-//			System.out.println("Here: " + state);
 			if(state !=null){
 				SearchTreeNode nodeTemp = new SearchTreeNode(state,node,operators[i],node.depth+1,state.pathCost);
 				nodes.add(nodeTemp);
@@ -88,9 +88,16 @@ public abstract class SearchProblem {
 	public SearchTreeNode generalSearch(String strategy){
 		ArrayList<SearchTreeNode> nodes = new ArrayList<SearchTreeNode>();
 		nodes.add(new SearchTreeNode(this.initialState,null,null,0,0));
+		
+//		System.out.println(nodes.size());
+		for(SearchTreeNode n: nodes) {
+			System.out.println(n.state);
+		}
+		
 		while(!nodes.isEmpty()){
 			SearchTreeNode node = nodes.remove(0);
 			if(this.goalTest(node)){
+				System.out.println(node.state);
 				return node;
 			}
 			nodes = qingFunction(strategy, nodes, expand(node));

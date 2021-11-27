@@ -1,3 +1,4 @@
+package code;
 import java.awt.Point;
 
 public class Hostage {
