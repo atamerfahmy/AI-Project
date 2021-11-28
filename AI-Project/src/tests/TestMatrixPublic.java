@@ -815,6 +815,7 @@ public class TestMatrixPublic {
 			public static boolean applyPlan(String grid, String solution) {
 				String[] solutionArray  = solution.split(";");
 				String plan = solutionArray[0];
+
 				int blue = Integer.parseInt(solutionArray[1]);
 				int doors = Integer.parseInt(solutionArray[2]);
 				

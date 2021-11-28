@@ -9,7 +9,7 @@ public abstract class SearchProblem {
 	String [] operators;
 	int nodesExpanded = 0;
 	int currlevel = 0;
-		
+	int count = 0;
 	Hashtable<String, String> states = new Hashtable<String, String>();
 	
 	public abstract boolean goalTest(SearchTreeNode node);
@@ -29,10 +29,12 @@ public abstract class SearchProblem {
 		}
 		return nodes;
 	}
+	
 	public ArrayList<SearchTreeNode> qingFunction(String strategy, ArrayList<SearchTreeNode> oldNodes, ArrayList<SearchTreeNode> newNodes){
 		switch(strategy){
 		case "BF":{
 			 oldNodes.addAll(newNodes);
+			 count++;
 			 return oldNodes;
 		}
 		case "DF":{
@@ -90,16 +92,19 @@ public abstract class SearchProblem {
 		nodes.add(new SearchTreeNode(this.initialState,null,null,0,0));
 		
 //		System.out.println(nodes.size());
-		for(SearchTreeNode n: nodes) {
-			System.out.println(n.state);
-		}
+//		for(SearchTreeNode n: nodes) {
+//			System.out.println(n.state);
+//		}
 		
 		while(!nodes.isEmpty()){
 			SearchTreeNode node = nodes.remove(0);
 			if(this.goalTest(node)){
-				System.out.println(node.state);
+//				System.out.println(node.state);
 				return node;
 			}
+//			if(count == 31) {
+//				System.exit(0);
+//			}
 			nodes = qingFunction(strategy, nodes, expand(node));
 		}	
 		return null;

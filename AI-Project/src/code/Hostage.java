@@ -8,14 +8,16 @@ public class Hostage {
 	boolean isCarried;
 	boolean isAgent;
 	boolean isDead;
+	boolean isSaved;
 
-	public Hostage(Point position, int damage) {
+	public Hostage(Point position, int damage, boolean isCarried, boolean isAgent, boolean isDead, boolean isSaved) {
 		super();
 		this.position = position;
 		this.damage = damage;
-		this.isCarried = false;
-		this.isAgent = false;
-		this.isDead = false;
+		this.isCarried = isCarried;
+		this.isAgent = isAgent;
+		this.isDead = isDead;
+		this.isSaved = isSaved;
 	}
 
 	public Point getPosition() {
@@ -34,7 +36,7 @@ public class Hostage {
 		this.damage = damage;
 		if(this.damage + damage > 100 && !isAgent && !isDead) {
 			this.damage = 100;
-			death++;
+			death+=1;
 			if(!isCarried) {
 				this.isAgent = true;
 			}else {
@@ -48,6 +50,11 @@ public class Hostage {
 			this.damage += damage;
 		}
 		return death;
+	}
+	
+	public String toString() {
+		return "x: " + this.position.x + " y: " + this.position.y + " Damage: " + this.damage +
+				" isCarried: " + isCarried + " isAgent: " + isAgent + " isDead: " + isDead;
 	}
 	
 }

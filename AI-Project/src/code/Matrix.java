@@ -5,36 +5,19 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import org.hamcrest.core.IsSame;
+
 public class Matrix extends SearchProblem {
 
 	int rows;
 	int columns;
-//	Point Neo;
 	Point Telephone;
 	int C;
-
-//	NeoState neoState;
-
-//	ArrayList<Point> agents;
-//	ArrayList<Point> pills;
-//	ArrayList<Pad> pads;
-//	ArrayList<Hostage> hostages;
 
 	public Matrix(String grid) {
 		super();
 
 		String[] g1 = grid.split(";");
-
-//		System.out.println();
-//		
-//		System.out.println(g1.length);
-//
-//		System.out.println();
-
-//		for (String x : g1) {
-//			System.out.println(x);
-//		}
-
 		String[] g2 = g1[0].split(",");
 
 		this.rows = Integer.parseInt(g2[0]);
@@ -44,8 +27,6 @@ public class Matrix extends SearchProblem {
 
 		String[] g3 = g1[2].split(",");
 		Point Neo = new Point(Integer.parseInt(g3[0]), Integer.parseInt(g3[1]));
-
-//		this.neoState = new NeoState(neoPos, 0);
 
 		String[] g4 = g1[3].split(",");
 		this.Telephone = new Point(Integer.parseInt(g4[0]), Integer.parseInt(g4[1]));
@@ -73,11 +54,11 @@ public class Matrix extends SearchProblem {
 		ArrayList<Hostage> hostages = new ArrayList<Hostage>();
 		for (int i = 0; i + 2 < g8.length; i = i + 3) {
 			hostages.add(new Hostage(new Point(Integer.parseInt(g8[i]), Integer.parseInt(g8[i + 1])),
-					Integer.parseInt(g8[i + 2])));
+					Integer.parseInt(g8[i + 2]), false, false, false, false));
 		}
 
-		initialState = new NeoState(Neo, new ArrayList<Hostage>(), agents, pills, pads, hostages, 0, 0, 0, Neo);
-		operators = new String[] { "carry", "fly", "kill", "down", "left", "right", "up", "drop", "takePill" };
+		initialState = new NeoState(Neo, new ArrayList<Hostage>(), agents, pills, pads, hostages, 0, 0, 0, Neo, hostages.size());
+		operators = new String[] { "up", "down", "right", "left", "carry", "drop", "kill", "takePill", "fly" };
 
 	}
 
@@ -92,46 +73,74 @@ public class Matrix extends SearchProblem {
 	@SuppressWarnings("unchecked")
 	public State transitionFunction(State state, String operator) {
 
+		
 		NeoState neoState = ((NeoState) ((NeoState) state));
 
-//		if(neoState == null) {
-//			return null;
-//		}
-//		Point neoCurrentPosition = neoState.getPosition();
-		Point neoCurrentPosition = (Point) neoState.position.clone();
-		ArrayList<Hostage> carried = (ArrayList<Hostage>) neoState.carried.clone();
-		ArrayList<Point> agents = (ArrayList<Point>) neoState.agents.clone();
-		ArrayList<Point> pills = (ArrayList<Point>) neoState.pills.clone();
-		ArrayList<Pad> pads = (ArrayList<Pad>) neoState.pads.clone();
-		ArrayList<Hostage> hostages = (ArrayList<Hostage>) neoState.hostages.clone();
-		int damage = neoState.damage;
-		int killed = neoState.killed;
-		int death = neoState.death;
-		Point prev = (Point) neoState.prev.clone();
-
-
-//		if(neoCurrentPosition == null) {
-//			return null;
-//		}
-//		
-//		System.out.println(neoCurrentPosition);
-
-		for (int i = 0; i < hostages.size(); i++) {
-			death = hostages.get(i).addDamage(death, 2);
+		ArrayList<Hostage> carried = new ArrayList<Hostage>();
+		for(Hostage hostage: (ArrayList<Hostage>) neoState.getCarried().clone()) {
+			carried.add(new Hostage(hostage.position, hostage.damage, hostage.isCarried, hostage.isAgent, hostage.isDead, hostage.isSaved));
 		}
-		for (int i = 0; i < carried.size(); i++) {
-			death = carried.get(i).addDamage(death, 2);
+		
+		
+		ArrayList<Point> agents = new ArrayList<Point>();
+		for(Point agent: (ArrayList<Point>) neoState.getAgents().clone()) {
+			agents.add(new Point(agent));
 		}
+		
+		ArrayList<Point> pills = new ArrayList<Point>();
+		for(Point pill: (ArrayList<Point>) neoState.getPills().clone()) {
+			pills.add(new Point(pill));
+		}
+		
+		ArrayList<Pad> pads = new ArrayList<Pad>();
+		for(Pad pad: (ArrayList<Pad>) neoState.getPads().clone()) {
+			pads.add(new Pad(new Point(pad.startPad), new Point(pad.finishPad)));
+		}
+		
+		ArrayList<Hostage> hostages = new ArrayList<Hostage>();
+		for(Hostage hostage: (ArrayList<Hostage>) neoState.getHostages().clone()) {
+			hostages.add(new Hostage(hostage.position, hostage.damage, hostage.isCarried, hostage.isAgent, hostage.isDead, hostage.isSaved));
+		}
+		
+		Point neoCurrentPosition = new Point(neoState.getPosition());
+//		ArrayList<Hostage> carried = (ArrayList<Hostage>) neoState.getCarried().clone();
+//		ArrayList<Point> agents = (ArrayList<Point>) neoState.getAgents().clone();
+//		ArrayList<Point> pills = (ArrayList<Point>) neoState.getPills().clone();
+//		ArrayList<Pad> pads = (ArrayList<Pad>) neoState.getPads().clone();
+//		ArrayList<Hostage> hostages = (ArrayList<Hostage>) neoState.getHostages().clone();
 
+		
+		int damage = neoState.getDamage();
+		int killed = neoState.getKilled();
+		int death = neoState.getDeath();
+		Point prev = new Point(neoState.getPrev());
+		int hostagesCount = neoState.getHostagesCount();
+
+//		hostages = NeoState.addDamageToHostages(hostages, 2);
+//		carried = NeoState.addDamageToHostages(carried, 2);
+		
+//		for(Hostage x: hostages) {
+//			if(x.isAgent) {
+//				System.out.println(x.position.x + "," + x.position.y);
+//			}
+//		}
+
+//		System.out.println(death);
 		switch (operator) {
 		case "up": {
 			Point topAdj = new Point(neoCurrentPosition.x - 1, neoCurrentPosition.y);
-			if (topAdj.x >= 0 && topAdj.x <= rows && !agentCollision(neoCurrentPosition, agents, hostages, topAdj)) {
-				State newState = new NeoState(topAdj, carried, agents, pills, pads, hostages, damage, killed, death, neoCurrentPosition);
+			
+			if (topAdj.x >= 0 && !agentCollision(agents, hostages, topAdj)) {
+				hostages = NeoState.addDamageToHostages(hostages, 2);
+				carried = NeoState.addDamageToHostages(carried, 2);
+				State newState = new NeoState(topAdj, carried, agents, pills, pads, hostages, damage, killed, death, neoCurrentPosition, hostagesCount);
 				if (states.containsKey(newState.toString())) {
 					return null;
 				}
-
+//				if(count > 20) {
+//					System.out.print(count + " " + operator + " ");
+//					System.out.println(((NeoState) newState).visualizeString());
+//				}
 				states.put(newState.toString(), "");
 				return newState;
 
@@ -140,15 +149,27 @@ public class Matrix extends SearchProblem {
 		}
 		case "down": {
 			Point downAdj = new Point(neoCurrentPosition.x + 1, neoCurrentPosition.y);
-			if (downAdj.x >= 0 && downAdj.x <= rows && !agentCollision(neoCurrentPosition, agents, hostages, downAdj)) {
+			
+			if (downAdj.x < rows && !agentCollision(agents, hostages, downAdj)) {
 //				neoState.positions.add(downAdj);
-				State newState = new NeoState(downAdj, carried, agents, pills, pads, hostages, damage, killed, death, neoCurrentPosition);
+//				if(count == 26) {
+//					System.out.println("HERE");
+//				}
+				hostages = NeoState.addDamageToHostages(hostages, 2);
+				carried = NeoState.addDamageToHostages(carried, 2);
+				State newState = new NeoState(downAdj, carried, agents, pills, pads, hostages, damage, killed, death, neoCurrentPosition, hostagesCount);
 
 				if (states.containsKey(newState.toString())) {
+					if(count == 26) {
+						System.out.println("HERE2");
+					}
 					return null;
 				}
 				states.put(newState.toString(), "");
-
+//				if(count > 20) {
+//					System.out.print(count + " " + operator + " ");
+//					System.out.println(((NeoState) newState).visualizeString());
+//				}
 				return newState;
 
 			} else
@@ -156,14 +177,21 @@ public class Matrix extends SearchProblem {
 		}
 		case "left": {
 			Point leftAdj = new Point(neoCurrentPosition.x, neoCurrentPosition.y - 1);
-			if (leftAdj.y >= 0 && leftAdj.y <= columns && !agentCollision(neoCurrentPosition, agents, hostages, leftAdj)) {
-				State newState = new NeoState(leftAdj, carried, agents, pills, pads, hostages, damage, killed, death, neoCurrentPosition);
+			
+			if (leftAdj.y >= 0 && !agentCollision(agents, hostages, leftAdj)) {
+				
+				hostages = NeoState.addDamageToHostages(hostages, 2);
+				carried = NeoState.addDamageToHostages(carried, 2);
+				State newState = new NeoState(leftAdj, carried, agents, pills, pads, hostages, damage, killed, death, neoCurrentPosition, hostagesCount);
 
 				if (states.containsKey(newState.toString())) {
 					return null;
 				}
 				states.put(newState.toString(), "");
-
+//				if(count > 20) {
+//					System.out.print(count + " " + operator + " ");
+//					System.out.println(((NeoState) newState).visualizeString());
+//				}
 				return newState;
 
 			} else
@@ -171,12 +199,20 @@ public class Matrix extends SearchProblem {
 		}
 		case "right": {
 			Point rightAdj = new Point(neoCurrentPosition.x, neoCurrentPosition.y + 1);
-			if (rightAdj.y >= 0 && rightAdj.y <= columns && !agentCollision(neoCurrentPosition, agents, hostages, rightAdj)) {
-				State newState = new NeoState(rightAdj, carried, agents, pills, pads, hostages, damage, killed, death, neoCurrentPosition);
+			
+			if (rightAdj.y < columns && !agentCollision(agents, hostages, rightAdj)) {
+				
+				hostages = NeoState.addDamageToHostages(hostages, 2);
+				carried = NeoState.addDamageToHostages(carried, 2);
+				State newState = new NeoState(rightAdj, carried, agents, pills, pads, hostages, damage, killed, death, neoCurrentPosition, hostagesCount);
+				
 				if (states.containsKey(newState.toString())) {
 					return null;
 				}
-
+//				if(count > 20) {
+//					System.out.print(count + " " + operator + " ");
+//					System.out.println(((NeoState) newState).visualizeString());
+//				}
 				states.put(newState.toString(), "");
 				return newState;
 
@@ -197,12 +233,19 @@ public class Matrix extends SearchProblem {
 
 			if (flyTo != null) {
 //				System.out.println("FLY");
+				
+				hostages = NeoState.addDamageToHostages(hostages, 2);
+				carried = NeoState.addDamageToHostages(carried, 2);
+				
 				State newState = new NeoState(flyTo, carried, agents, pills, pads, hostages, damage, killed, death,
-						neoCurrentPosition);
+						neoCurrentPosition, hostagesCount);
 				if (states.containsKey(newState.toString())) {
 					return null;
 				}
-
+//				if(count > 20) {
+//					System.out.print(count + " " + operator + " ");
+//					System.out.println(((NeoState) newState).visualizeString());
+//				}
 				states.put(newState.toString(), "");
 				return newState;
 			} else {
@@ -212,86 +255,145 @@ public class Matrix extends SearchProblem {
 		}
 		case "kill": {
 
-			ArrayList<Point> agentsTemp = (ArrayList<Point>) agents.clone();
+//			ArrayList<Hostage> agentsTemp = new ArrayList<Hostage>();
+			Hostage hasHostage = null;
+			for(Hostage h: (ArrayList<Hostage>) hostages.clone()) {
+				hasHostage = h;
+			}
+			if(damage >= 80)
+				return null;
+			
 			boolean hasKilled = false;
 			
 			for (int i = 0; i < agents.size(); i++) {
 				if (neoCurrentPosition.x - 1 == agents.get(i).x && neoCurrentPosition.y == agents.get(i).y) // adjacent																											// down
 				{
-					agentsTemp.remove(agents.get(i));
+					if(hasHostage != null && hasHostage.damage >= 98) {
+						continue;
+					}
+					agents.remove(i);
+					i--;
 					hasKilled = true;
 					killed++;
+					continue;
 				}
 				if (neoCurrentPosition.x + 1 == agents.get(i).x && neoCurrentPosition.y == agents.get(i).y) // adjacent
 				{
-					agentsTemp.remove(agents.get(i));
+					if(hasHostage != null && hasHostage.damage >= 98) {
+						continue;
+					}
+					agents.remove(i);
+					i--;
 					hasKilled = true;
 					killed++;
+					continue;
 
 				}
 				if (neoCurrentPosition.x == agents.get(i).x && neoCurrentPosition.y - 1 == agents.get(i).y) // adjacent
 				{
-					agentsTemp.remove(agents.get(i));
+					if(hasHostage != null && hasHostage.damage >= 98) {
+						continue;
+					}
+					agents.remove(i);
+					i--;
 					hasKilled = true;
 					killed++;
+					continue;
 
 				}
 				if (neoCurrentPosition.x == agents.get(i).x && neoCurrentPosition.y + 1 == agents.get(i).y) // adjacent
 				{
-					agentsTemp.remove(agents.get(i));
+					if(hasHostage != null && hasHostage.damage >= 98) {
+						continue;
+					}
+					agents.remove(i);
+					i--;
 					hasKilled = true;
 					killed++;
+					continue;
 
 				}
 			}
 			
-			ArrayList<Hostage> hostTemp = (ArrayList<Hostage>) hostages.clone();
-
+			ArrayList<Hostage> hostTemp = new ArrayList<Hostage>();
+			
+			for(Hostage hostage: (ArrayList<Hostage>) hostages.clone()) {
+				hostTemp.add(new Hostage(hostage.position, hostage.damage, hostage.isCarried, hostage.isAgent, hostage.isDead, hostage.isSaved));
+			}
+			
 			for (int i = 0; i < hostages.size(); i++) {
-				if (hostages.get(i).isAgent && !hostages.get(i).isCarried) {
+				if (hostages.get(i).isAgent && !hostages.get(i).isCarried && !hostages.get(i).isDead && !hostages.get(i).isSaved) {
+//					System.out.println(hostages.get(i).position.x + "," + hostages.get(i).position.y);
 					if (neoCurrentPosition.x - 1 == hostages.get(i).position.x
 							&& neoCurrentPosition.y == hostages.get(i).position.y) // adjacent
 					{
-						hostTemp.remove(hostages.get(i));
+						if(hasHostage != null && hasHostage.damage >= 98) {
+							continue;
+						}
+//						hostTemp.remove(hostages.get(i));
+						hostTemp.get(i).isDead = true;
 						hasKilled = true;
 						killed++;
+						continue;
 
 					}
 					if (neoCurrentPosition.x + 1 == hostages.get(i).position.x
 							&& neoCurrentPosition.y == hostages.get(i).position.y) // adjacent
 					{
-						hostTemp.remove(hostages.get(i));
+						if(hasHostage != null && hasHostage.damage >= 98) {
+							continue;
+						}
+//						hostTemp.remove(hostages.get(i));
+						hostTemp.get(i).isDead = true;
+
 						hasKilled = true;
 						killed++;
+						continue;
 
 					}
 					if (neoCurrentPosition.x == hostages.get(i).position.x
 							&& neoCurrentPosition.y - 1 == hostages.get(i).position.y) // adjacent
 					{
-						hostTemp.remove(hostages.get(i));
+						if(hasHostage != null && hasHostage.damage >= 98) {
+							continue;
+						}
+//						hostTemp.remove(hostages.get(i));
+						hostTemp.get(i).isDead = true;
+
 						hasKilled = true;
 						killed++;
+						continue;
 
 					}
 					if (neoCurrentPosition.x == hostages.get(i).position.x
 							&& neoCurrentPosition.y + 1 == hostages.get(i).position.y) // adjacent
 					{
-						hostTemp.remove(hostages.get(i));
+						if(hasHostage != null && hasHostage.damage >= 98) {
+							continue;
+						}
+//						hostTemp.remove(hostages.get(i));
+						hostTemp.get(i).isDead = true;
 						hasKilled = true;
 						killed++;
+						continue;
 
 					}
 				}
 			}
 
 			if(hasKilled) {
-				setDamage(damage, 20);
-				int newDamage = neoState.damage;
-				State newState = new NeoState(neoCurrentPosition, carried, agentsTemp, pills, pads, hostTemp, newDamage, killed, death, prev);
+				
+				int newDamage = setDamage(damage, 20);
+				hostTemp = NeoState.addDamageToHostages(hostTemp, 2);
+				carried = NeoState.addDamageToHostages(carried, 2);
+				State newState = new NeoState(neoCurrentPosition, carried, agents, pills, pads, hostTemp, newDamage, killed, death, prev, hostagesCount);
 				if (states.containsKey(newState.toString())) {
 					return null;
 				}
-
+//				if(count > 20) {
+//					System.out.print(count + " " + operator + " ");
+//					System.out.println(((NeoState) newState).visualizeString());
+//				}
 				states.put(newState.toString(), "");
 				return newState;
 			}else {
@@ -300,25 +402,33 @@ public class Matrix extends SearchProblem {
 		}
 		case "carry": {
 			Hostage hostage = null;
-			for (Hostage x : hostages) {
-				if (x.position.x == neoCurrentPosition.x && x.position.y == neoCurrentPosition.y) {
+			int index = -1;
+			for (int i = 0; i < hostages.size(); i++) {
+				Hostage x = hostages.get(i);
+				if (x.position.x == neoCurrentPosition.x && x.position.y == neoCurrentPosition.y && !x.isAgent && !x.isCarried && !x.isSaved) {
 					hostage = x;
+					index = i;
 					break;
 				}
 			}
 
 			if (hostage != null && carried.size() < this.C) {
-//				System.out.println("Carry");
 
 				hostage.isCarried = true;
 				carried.add(hostage);
-				hostages.remove(hostage);
+				hostages.remove(index);
 
-				State newState = new NeoState(neoCurrentPosition, carried, agents, pills, pads, hostages, damage, killed, death, prev);
+				hostages = NeoState.addDamageToHostages(hostages, 2);
+				carried = NeoState.addDamageToHostages(carried, 2);
+				
+				State newState = new NeoState(neoCurrentPosition, carried, agents, pills, pads, hostages, damage, killed, death, prev, hostagesCount);
 				if (states.containsKey(newState.toString())) {
 					return null;
 				}
-
+//				if(count > 20) {
+//					System.out.print(count + " " + operator + " ");
+//					System.out.println(((NeoState) newState).visualizeString());
+//				}
 				states.put(newState.toString(), "");
 				return newState;
 			} else
@@ -328,24 +438,37 @@ public class Matrix extends SearchProblem {
 
 		case "drop": {
 
+			
 			if (!carried.isEmpty() && neoCurrentPosition.x == Telephone.x && neoCurrentPosition.y == Telephone.y) {
-//				System.out.println(carried.size());
+//				carried = NeoState.addDamageToHostages(carried, -2);
+//				death = NeoState.calcDeaths(hostages, carried, hostagesCount);
+
 				for (int i = 0; i < carried.size(); i++) {
-					int index = hostages.indexOf(carried.get(i));
-					if(index != -1) {
-						Hostage f = hostages.remove(index);
-//						System.out.println(true);
+					
+					Hostage x = new Hostage(carried.get(i).getPosition(), carried.get(i).damage, false, carried.get(i).isAgent, carried.get(i).isDead, carried.get(i).isSaved);
+//					x.isCarried = false;
+					if(!x.isDead) {
+						x.isSaved = true;
 					}
+					hostages.add(x);
 					
 				}
-				carried = new ArrayList<Hostage>();
+				ArrayList<Hostage> newCarried = new ArrayList<Hostage>();
 				
-				State newState = new NeoState(neoCurrentPosition, carried, agents, pills, pads, hostages, damage, killed, death, prev);
+				hostages = NeoState.addDamageToHostages(hostages, 2);
+//				carried = NeoState.addDamageToHostages(carried, 2);
+				
+				State newState = new NeoState(neoCurrentPosition, newCarried, agents, pills, pads, hostages, damage, killed, death, prev, hostagesCount);
+
 				if (states.containsKey(newState.toString())) {
 					return null;
 				}
 //				System.out.println("DROP: " + hostages.size());
 				states.put(newState.toString(), "");
+//				if(count > 20) {
+//					System.out.print(count + " " + operator + " ");
+//					System.out.println(((NeoState) newState).visualizeString());
+//				}
 				return newState;
 			} else
 				return null;
@@ -358,27 +481,33 @@ public class Matrix extends SearchProblem {
 			for(int i = 0; i < pills.size(); i++) {
 				if(pills.get(i).x == neoCurrentPosition.x && pills.get(i).y == neoCurrentPosition.y) {
 					pill = pills.get(i);
-					pills.remove(i);
+//					pills.remove(i);
 					break;
 				}
 			}
-			if(pill != null) {
-				setDamage(damage, -20);
-				int newDamage = neoState.damage;
-//				for(int i = 0; i < hostages)
-				State newState = new NeoState(neoCurrentPosition, carried, agents, pills, pads, hostages, newDamage, killed, death, prev);
+			if(pill != null ) {
+				int newDamage = setDamage(damage, -20);
+				ArrayList<Hostage> newHostages = NeoState.addDamageToHostages(hostages, -20);
+				ArrayList<Hostage> newCarried = NeoState.addDamageToHostages(carried, -20);
+				
+//				ArrayList<Hostage> newHostages = NeoState.addDamageToHostages(hostages, -22);
+//				ArrayList<Hostage> newCarried = NeoState.addDamageToHostages(carried, -22);
+				
+				State newState = new NeoState(neoCurrentPosition, newCarried, agents, new ArrayList<Point>(), pads, newHostages, newDamage, killed, death, prev, hostagesCount);
 
 				if (states.containsKey(newState.toString())) {
 					return null;
 				}
-
+//				if(count > 20) {
+//					System.out.print(count + " " + operator + " ");
+//					System.out.println(((NeoState) newState).visualizeString());
+//				}
 				states.put(newState.toString(), "");
 				return newState;
 			}
 			else
 				return null;
 			
-
 		}
 		default:
 			return null;
@@ -386,7 +515,7 @@ public class Matrix extends SearchProblem {
 		}
 	}
 
-	public static void setDamage(int damage, int value) {
+	public static int setDamage(int damage, int value) {
 		
 		//value is negative to increase health/decrease damage
 		if(damage + value < 0) {
@@ -399,24 +528,36 @@ public class Matrix extends SearchProblem {
 			damage += value;
 		}
 		
+		return damage;
+		
 	}
 	
-	public static boolean agentCollision(Point neoLoc, ArrayList<Point> agentsArray, ArrayList<Hostage> hostagesArray, Point adj) {
+	public boolean agentCollision(ArrayList<Point> agentsArray, ArrayList<Hostage> hostagesArray, Point adj) {
 
+		
 		for (Point p : agentsArray) {
 			if(p.x == adj.x && p.y == adj.y) {
+//				if(count == 26) {
+//					System.out.println(true);
+//				}
 				return true;
 			}
 		}
 
 		for (Hostage p : hostagesArray) {
-			if(p.isAgent) {
-				if(p.position.x == adj.x && p.position.y == adj.y) {
+			if(p.position.x == adj.x && p.position.y == adj.y) {
+				if((p.isAgent && !p.isDead) || (!p.isAgent && p.damage >= 98) ) {
+//					if(count == 26) {
+//						System.out.println(true);
+//					}
 					return true;
 				}
 			}
 		}
 
+//		if(count == 26) {
+//			System.out.println(false);
+//		}
 		return false;
 	}
 	
@@ -433,12 +574,23 @@ public class Matrix extends SearchProblem {
 		
 		return false;
 	}
+	
+	public static boolean pillCollision(NeoState neoState, ArrayList<Point> pills) {
+		
+		for(Point pill: pills) {
+			if(pill.x == neoState.position.x && pill.y == neoState.position.y) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
 
 	public static void main(String[] args) {
 
 		String grid = "5,5;2;0,4;1,4;0,1,1,1,2,1,3,1,3,3,3,4;1,0,2,4;0,3,4,3,4,3,0,3;0,0,30,3,0,80,4,4,80";
 
-		String s = solve(grid, "BF", false);
+		String s = solve(grid, "UC", false);
 		System.out.println(s);
 
 //		String grid = "5,5;2;0,4;1,4;0,1,1,1,2,1,3,1,3,3,3,4;1,0,2,4;0,3,4,3,4,3,0,3;0,0,30,3,0,80,4,4,80";
@@ -447,36 +599,6 @@ public class Matrix extends SearchProblem {
 //		System.out.println(e1.pads);
 //		System.out.println(e1.);
 //		System.out.println(ir4);
-
-		// SearchTreeNode root = new SearchTreeNode(initialState,null,null,0,0);
-//		State ir = e1.transitionFunction((NeoState) e1.initialState, "left");
-////		State ir1 = e1.transitionFunction((NeoState) ir, "collect");
-//		State ir2 = e1.transitionFunction((NeoState) ir, "left");
-//		State ir3 = e1.transitionFunction((NeoState) ir2, "kill");
-//		State ir4 = e1.transitionFunction((NeoState) ir3, "right");
-//		System.out.println(e1.states);
-//		System.out.println(print(e1.agents));
-
-//		System.out.println(ir3);
-//		State ir4 = e1.transitionFunction((NeoState) ir3, "collect");
-//		State ir5 = e1.transitionFunction((NeoState) ir4, "down");
-//		State ir6 = e1.transitionFunction((NeoState) ir5, "collect");
-//		State ir7 = e1.transitionFunction((NeoState) ir6, "right");
-//		State ir8 = e1.transitionFunction((NeoState) ir7, "collect");
-//		State ir9 = e1.transitionFunction((NeoState) ir8, "kill");
-//		State ir10 = e1.transitionFunction((NeoState) ir9, "down");
-//		State ir11 = e1.transitionFunction((NeoState) ir10, "down");
-//		State ir12 = e1.transitionFunction((NeoState) ir11, "left");
-//		State ir13 = e1.transitionFunction((NeoState) ir12, "collect");
-//		State ir14 = e1.transitionFunction((NeoState) ir13, "left");
-//		State ir15 = e1.transitionFunction((NeoState) ir14, "collect");
-//		State ir16 = e1.transitionFunction((NeoState) ir15, "right");
-//		State ir17 = e1.transitionFunction((NeoState) ir16, "up");
-		// State ir18 = e1.transitionFunction((NeoState) ir17, "snap");
-
-//		System.out.println(((NeoState)ir17).positions);
-//		System.out.println("pathCost:"+((NeoState)ir17).pathCost);
-//		
 
 	}
 
@@ -489,20 +611,27 @@ public class Matrix extends SearchProblem {
 //		System.out.println(node);
 
 		if (node != null) {
-			NeoState neoState = ((NeoState) ((NeoState) node.state));
+			NeoState neoState = ((NeoState) node.state);
+//			System.out.println(neoState.visualizeString());
 //			int pathcost = node.pathCost;
 //			result += "snap";
+			int count = 0;
 			while (node.parent != null) {
+				count++;
 				result = node.operator + "," + result;
+				System.out.println(node.operator + " " + ((NeoState) node.state).visualizeString());
 				node = node.parent;
 			}
 
+			System.out.println(count);
 			result = result.substring(0, result.length() - 1);
 			result += ";" + neoState.death + ";" + neoState.killed + ";" + matrix.nodesExpanded;
 		} else {
 			result = "No Solution";
 		}
 
+		System.out.println(result);
+		
 		return result;
 
 	}
@@ -755,16 +884,17 @@ public class Matrix extends SearchProblem {
 		NeoState s1 = (NeoState) node.state;
 		ArrayList<Hostage> hostages = s1.hostages;
 		ArrayList<Hostage> carried = s1.carried;
-
-//		System.out.println(s1.damage);
-		//Hostage turned to agent should die
-		boolean hostageToAgent = false;
-		for(int i = 0; i < hostages.size(); i++) {
-			if(hostages.get(i).isAgent) {
-				hostageToAgent = true;
+		
+		boolean hostageAlive = false;
+		for(Hostage x: hostages) {
+			if(!x.isDead && !x.isSaved) {
+				hostageAlive = true;
 			}
 		}
-		if (!hostageToAgent && s1.damage < 100 && hostages.isEmpty() && carried.isEmpty() && s1.position.x == Telephone.x && s1.position.y == Telephone.y) {
+		
+		if (s1.damage < 100 && !hostageAlive && carried.isEmpty() && s1.position.x == Telephone.x && s1.position.y == Telephone.y) {
+			s1.death = NeoState.calcDeaths(hostages, carried);
+			
 			return true;
 		}
 		else
