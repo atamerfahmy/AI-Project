@@ -62,6 +62,24 @@ public abstract class SearchProblem {
 			return sort(oldNodes);
 		}
 		
+		case "GR1":{
+			oldNodes.addAll(newNodes);
+			return sort(oldNodes);
+		}
+		case "GR2":{
+			oldNodes.addAll(newNodes);
+			return sort(oldNodes);
+		}
+		
+		case "AS1":{
+			oldNodes.addAll(newNodes);
+			return sort(oldNodes);
+		}
+		case "AS2":{
+			oldNodes.addAll(newNodes);
+			return sort(oldNodes);
+		}
+		
 		 default:
 			return oldNodes;
 			
