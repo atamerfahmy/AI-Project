@@ -18,17 +18,17 @@ public class NeoState extends State {
 	public NeoState(Point position, ArrayList<Hostage> carried, ArrayList<Point> agents, ArrayList<Point> pills, ArrayList<Pad> pads, ArrayList<Hostage> hostages, int damage, int killed, int death, int hostagesCount) {
 		
 		super();
-		this.position = position;
-		this.pathCost = this.damage;
-		this.carried = carried;
-		this.agents = agents;
-		this.pills = pills;
-		this.pads = pads;
-		this.hostages = hostages;
-		this.damage = damage;
-		this.killed = killed;
-		this.death = death;
-		this.hostagesCount = hostagesCount;
+		this.position = position; //Neo current position
+		this.pathCost = this.damage; //Path cost to a node
+		this.carried = carried; //Array of carried hostages by neo
+		this.agents = agents; //Array of all agents alive
+		this.pills = pills; //Array of pills
+		this.pads = pads; //Array of pads
+		this.hostages = hostages; //Array of hostages
+		this.damage = damage; //Neo's damage
+		this.killed = killed; //Number of agents killed including hostages who turned into agents
+		this.death = death; //Number of hostages died
+		this.hostagesCount = hostagesCount; //Number of hostages
 	}
 	
 	public Point getPosition() {
