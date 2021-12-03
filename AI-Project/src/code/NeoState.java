@@ -117,9 +117,9 @@ public class NeoState extends State {
 		int c = (kills + deaths) / 3;
 		int Neox = this.position.x;
 		int Neoy = this.position.y;
-		String[] tb = Matrix.telephonebooth().split(",");
-		int tbx = (Integer.parseInt(tb[1]));
-		int tby = (Integer.parseInt(tb[0]));
+		Point tb = Matrix.telephonebooth();
+		int tbx = tb.x;
+		int tby = tb.y;
 
 		int p = Math.abs(Neox - tbx) + Math.abs(Neoy - tby);
 
@@ -137,9 +137,9 @@ public class NeoState extends State {
 		int c = (kills + deaths) / 8;
 		int Neox = this.position.x;
 		int Neoy = this.position.y;
-		String[] tb = Matrix.telephonebooth().split(",");
-		int tbx = (Integer.parseInt(tb[1]));
-		int tby = (Integer.parseInt(tb[0]));
+		Point tb = Matrix.telephonebooth();
+		int tbx = tb.x;
+		int tby = tb.y;
 
 		int p = Math.abs(Neox - tbx) + Math.abs(Neoy - tby);
 
@@ -153,49 +153,31 @@ public class NeoState extends State {
 	public String toString() {
 		String value = "";
 		value += "Position: (" + position.x + "," + position.y + ")";
-//		value +=  carried.size() + "," + agents.size() + "," + pills.size() + "," + pads.size() + "," + hostages.size();
-
-//		value +=  -1 + "," + -1 + ",";
 
 		for (int i = 0; i < carried.size(); i++) {
-			// if(positions.get(i).x == -1)
-			// value += ";";
 			value += " Carried: (" + carried.get(i).position.x + "," + carried.get(i).position.y + ","
 					+ carried.get(i).isSaved + "," + carried.get(i).isDead + ") ";
 		}
-//		value +=  -1 + "," + -1 + ",";
 
 		for (int i = 0; i < hostages.size(); i++) {
-			// if(positions.get(i).x == -1)
-			// value += ";";
 			value += " Hostage: (" + hostages.get(i).position.x + "," + hostages.get(i).position.y + ","
 					+ hostages.get(i).isAgent + "," + hostages.get(i).isSaved + "," + hostages.get(i).isDead + ") ";
 		}
-//		value +=  -1 + "," + -1 + ",";
 
 		for (int i = 0; i < agents.size(); i++) {
-			// if(positions.get(i).x == -1)
-			// value += ";";
 			value += "Agent: (" + agents.get(i).x + "," + agents.get(i).y + ") ";
 		}
-//		value +=  -1 + "," + -1 + ",";
 
 		for (int i = 0; i < pills.size(); i++) {
-			// if(positions.get(i).x == -1)
-			// value += ";";
 			value += "Pill: (" + pills.get(i).x + "," + pills.get(i).y + ") ";
 		}
-//		value +=  -1 + "," + -1 + ",";
 
 		for (int i = 0; i < pads.size(); i++) {
-			// if(positions.get(i).x == -1)
-			// value += ";";
 			value += "Pad: (" + pads.get(i).getStartPad().x + "," + pads.get(i).getStartPad().y + ")";
 			value += "(" + pads.get(i).getEndPad().x + "," + pads.get(i).getEndPad().y + ") ";
 
 		}
 		value += damage;
-//		value +=   prev.x + "," + prev.y ;
 		return value;
 	}
 

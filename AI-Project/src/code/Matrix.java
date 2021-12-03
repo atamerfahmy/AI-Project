@@ -1,9 +1,7 @@
 package code;
 
 import java.awt.Point;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Hashtable;
 
 public class Matrix extends SearchProblem {
 
@@ -11,6 +9,7 @@ public class Matrix extends SearchProblem {
 	int columns;
 	Point Telephone;
 	int C;
+	static Point tb;
 
 	public Matrix(String grid, String strategy) {
 		super();
@@ -28,6 +27,7 @@ public class Matrix extends SearchProblem {
 
 		String[] g4 = g1[3].split(",");
 		this.Telephone = new Point(Integer.parseInt(g4[0]), Integer.parseInt(g4[1]));
+		tb = new Point(Telephone.x, Telephone.y);
 
 		String[] g5 = g1[4].split(",");
 		ArrayList<Point> agents = new ArrayList<Point>();
@@ -505,87 +505,54 @@ public class Matrix extends SearchProblem {
 		String[][] grid = new String[M][N];
 		NeoState neoState = (NeoState) neo;
 
+		for (int i = 0; i < grid.length; i++) {
+			for (int j = 0; j < grid[i].length; j++) {
+				grid[i][j] = "";
+			}
+		}
+		
 		for (int j = 0; j < neoState.agents.size(); j++) {
 
 			Point agent = neoState.agents.get(j);
-			grid[agent.x][agent.y] = "        Ag        ";
+			grid[agent.x][agent.y] += "        Ag        ";
 
 		}
 		for (int i = 0; i < neoState.pills.size(); i++) {
 
 			Point pill = neoState.pills.get(i);
-			grid[pill.x][pill.y] = "        Pl        ";
+			grid[pill.x][pill.y] += "        Pl        ";
 
 		}
 		for (int i = 0; i < neoState.pads.size(); i++) {
 			Point pad1 = neoState.pads.get(i).startPad;
 			Point pad2 = neoState.pads.get(i).finishPad;
-			if (i > 9) {
-				if (((pad1.x) > 9 && (pad1.x) < 10)
-						|| ((pad1.x) < 10 && (pad1.x) > 9)) {
-					grid[(pad1.x)][(pad1.y)] = "  Pad" + i + " (" + pad1.x + "," + pad1.y
-							+ ")   ";
-					grid[(pad2.x)][(pad2.y)] = "  Pad" + i + " (" + pad2.x + "," + pad2.y + ")   ";
-				}
+			System.out.println(pad1 + " " + pad2);
 
-				else if ((pad1.x) > 9 && (pad1.x) > 9) {
-					grid[(pad1.x)][(pad1.y)] = "  Pad" + i + " (" + pad1.x + "," + pad1.y
-							+ ")  ";
-					grid[(pad2.x)][(pad2.y)] = "  Pad" + i + " (" + pad2.x + "," + pad2.y + ")  ";
-				}
-
-				else {
-					grid[(pad1.x)][(pad1.y)] = "   Pad" + i + " (" + pad1.x + "," + pad1.y
-							+ ")   ";
-					grid[(pad2.x)][(pad2.y)] = "   Pad" + i + " (" + pad2.x + "," + pad2.y
-							+ ")   ";
-				}
-			} else {
-				if (((pad1.x) > 9 && (pad1.x) < 10)
-						|| ((pad1.x) < 10 && (pad1.x) > 9)) {
-					grid[(pad1.x)][(pad1.y)] = "   Pad" + i + " (" + pad1.x + "," + pad1.y
-							+ ")   ";
-					grid[(pad2.x)][(pad2.y)] = "   Pad" + i + " (" + pad2.x + "," + pad2.y
-							+ ")   ";
-				}
-
-				else if ((pad1.x) > 9 && (pad1.x) > 9) {
-					grid[(pad1.x)][(pad1.y)] = "  Pad" + i + " (" + pad1.x + "," + pad1.y
-							+ ")   ";
-					grid[(pad2.x)][(pad2.y)] = "  Pad" + i + " (" + pad2.x + "," + pad2.y + ")   ";
-				}
-
-				else {
-					grid[(pad1.x)][(pad1.y)] = "   Pad" + i + " (" + pad1.x + "," + pad1.y
-							+ ")    ";
-					grid[(pad2.x)][(pad2.y)] = "   Pad" + i + " (" + pad2.x + "," + pad2.y
-							+ ")    ";
-				}
-			}
-
+			grid[(pad1.x)][(pad1.y)] += "  Pad" + i + " (" + pad1.x + "," + pad1.y + ")   ";
+			grid[(pad2.x)][(pad2.y)] += "  Pad" + i + " (" + pad2.x + "," + pad2.y + ")   ";
 		}
 		for (int i = 0; i < neoState.hostages.size(); i++) {
 			Hostage hostage = neoState.hostages.get(i);
 			if (hostage.isDead && hostage.isAgent) {
-				grid[hostage.position.x][hostage.position.y] = "      HS (DEAD-A)      ";
+				grid[hostage.position.x][hostage.position.y] += "      HS (DEAD-A)      ";
 			}
 			else if(hostage.isAgent) {
-				grid[hostage.position.x][hostage.position.y] = "      HS (AGENT)      ";
+				grid[hostage.position.x][hostage.position.y] += "      HS (AGENT)      ";
 
 			} else if(hostage.isSaved && !hostage.isDead) {
-				grid[hostage.position.x][hostage.position.y] = "      HS (SAVED)      ";
+				grid[hostage.position.x][hostage.position.y] += "      HS (SAVED)      ";
 			}else if(hostage.isDead) {
-				grid[hostage.position.x][hostage.position.y] = "      HS (DEAD)      ";
+				grid[hostage.position.x][hostage.position.y] += "      HS (DEAD)      ";
 			}
 			else
-				grid[hostage.position.x][hostage.position.y] = "     HS (" + hostage.getDamage() + ")      ";
+				grid[hostage.position.x][hostage.position.y] += "     HS (" + hostage.getDamage() + ")      ";
 		}
-		grid[Telephone.x][Telephone.y] = "       TB        ";
-		grid[neoState.position.x][neoState.position.y] = "        NEO        ";
+		grid[Telephone.x][Telephone.y] += "       TB        ";
+		grid[neoState.position.x][neoState.position.y] += "        NEO        ";
 		String Output = "";
 		for (int i = 0; i < grid.length; i++) {
 			for (int j = 0; j < grid[i].length; j++) {
-				if (grid[i][j] == null)
+				if (grid[i][j] == "")
 					grid[i][j] = "                 ";
 				Output += " " + grid[i][j] + " |";
 			}
@@ -655,11 +622,9 @@ public class Matrix extends SearchProblem {
 
 		String grid = "5,5;2;0,4;1,4;0,1,1,1,2,1,3,1,3,3,3,4;1,0,2,4;0,3,4,3,4,3,0,3;0,0,30,3,0,80,4,4,80";
 
-		String s = solve(grid, "BF", true);
+		String s = solve(grid, "AS1", true);
 		System.out.println(s);
 	}
-
-	static String tb;
 
 	public static String solve(String grid, String strategy, boolean visualize) {
 
@@ -692,7 +657,7 @@ public class Matrix extends SearchProblem {
 		return result;
 
 	}
-	public static String telephonebooth() {
+	public static Point telephonebooth() {
 		return tb;
 	}
 
@@ -954,4 +919,5 @@ public class Matrix extends SearchProblem {
 		} else
 			return false;
 	}
+
 }
