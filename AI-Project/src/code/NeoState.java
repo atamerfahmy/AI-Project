@@ -100,6 +100,7 @@ public class NeoState extends State {
 		return deaths;
 	}
 	
+
 	public String toString()
 	{
 		String value = "";
