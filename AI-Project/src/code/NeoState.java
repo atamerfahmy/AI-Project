@@ -1,7 +1,7 @@
 package code;
+
 import java.awt.Point;
 import java.util.ArrayList;
-
 
 public class NeoState extends State {
 	Point position;
@@ -13,132 +13,239 @@ public class NeoState extends State {
 	ArrayList<Hostage> hostages;
 	int killed;
 	int death;
+	Point prev;
 	int hostagesCount;
-	
-	public NeoState(Point position, ArrayList<Hostage> carried, ArrayList<Point> agents, ArrayList<Point> pills, ArrayList<Pad> pads, ArrayList<Hostage> hostages, int damage, int killed, int death, int hostagesCount) {
-		
+
+	public NeoState(Point position, ArrayList<Hostage> carried, ArrayList<Point> agents, ArrayList<Point> pills,
+			ArrayList<Pad> pads, ArrayList<Hostage> hostages, int damage, int killed, int death,
+			int hostagesCount, String strategy) {
+
 		super();
-		this.position = position; //Neo current position
-		this.pathCost = this.damage; //Path cost to a node
-		this.carried = carried; //Array of carried hostages by neo
-		this.agents = agents; //Array of all agents alive
-		this.pills = pills; //Array of pills
-		this.pads = pads; //Array of pads
-		this.hostages = hostages; //Array of hostages
-		this.damage = damage; //Neo's damage
-		this.killed = killed; //Number of agents killed including hostages who turned into agents
-		this.death = death; //Number of hostages died
-		this.hostagesCount = hostagesCount; //Number of hostages
+		this.position = position;
+
+		if (strategy.equals("AS2") || strategy.equals("GR2")) {
+			this.heuristicCost = heuristicCost2();
+			this.asCost = this.pathCost + this.heuristicCost;
+
+		} else if (strategy.equals("AS1") || strategy.equals("GR1")) {
+			this.heuristicCost = heuristicCost1();
+			this.asCost = this.pathCost + this.heuristicCost;
+		}
+
+		this.pathCost = this.damage;
+
+		this.carried = carried;
+		this.agents = agents;
+		this.pills = pills;
+		this.pads = pads;
+		this.hostages = hostages;
+		this.damage = damage;
+		this.killed = killed;
+		this.death = death;
+		this.prev = prev;
+		this.hostagesCount = hostagesCount;
 	}
-	
+
 	public Point getPosition() {
+//		System.out.println(this.positions.get(this.positions.size()-1));
+//		for(Point x: positions) {
+//			System.out.println(x.x + " " + x.y);
+//		}
 		return this.position;
 	}
-	 
 
 	public static ArrayList<Hostage> addDamageToHostages(ArrayList<Hostage> hostages, int damage) {
-		
-		for(int i = 0; i < hostages.size(); i++) {
+
+		for (int i = 0; i < hostages.size(); i++) {
 			Hostage hostage = hostages.get(i);
-			if(hostage.damage + damage >= 100 && !hostage.isAgent && !hostage.isDead && !hostage.isSaved) {
+			if (hostage.damage + damage >= 100 && !hostage.isAgent && !hostage.isDead && !hostage.isSaved) {
 				hostages.get(i).damage = 100;
-				if(!hostage.isCarried) {
+				if (!hostage.isCarried) {
 					hostages.get(i).isAgent = true;
-				}else {
+				} else {
 					hostages.get(i).isDead = true;
+//					hostages.remove(i);
+//					i--;
 				}
-			}
-			else if(hostage.damage + damage < 0 && !hostage.isAgent && !hostage.isDead && !hostage.isSaved) {
+			} else if (hostage.damage + damage < 0 && !hostage.isAgent && !hostage.isDead && !hostage.isSaved) {
 				hostages.get(i).damage = 0;
-			}
-			else if (!hostage.isAgent && !hostage.isDead && !hostage.isSaved) {
-				
+			} else if (!hostage.isAgent && !hostage.isDead && !hostage.isSaved) {
+
 				hostages.get(i).damage += damage;
+
+//				if(hostages.get(i).damage >= 100) {
+//					if(!hostage.isCarried) {
+//						hostages.get(i).isAgent = true;
+//					}else {
+//						hostages.get(i).isDead = true;
+//					}
+//				}
+//			}else if(hostage.isDead) {
+//				if(hostages.get(i).damage + damage < 100) {
+//					hostages.get(i).isDead = false;
+//				}
 			}
 		}
-		
+
 		return hostages;
 	}
-	
+
 	public static int calcDeaths(ArrayList<Hostage> hostages, ArrayList<Hostage> carried) {
-		
+
 		int deaths = 0;
-		for(int i = 0; i < hostages.size(); i++) {
+		for (int i = 0; i < hostages.size(); i++) {
 			Hostage hostage = hostages.get(i);
-			if(hostage.isDead) {
+			if (hostage.isDead) {
 				deaths++;
 			}
 		}
-		
-		for(int i = 0; i < carried.size(); i++) {
+
+		for (int i = 0; i < carried.size(); i++) {
 			Hostage hostage = carried.get(i);
-			if(hostage.isDead) {
+			if (hostage.isDead) {
 				deaths++;
 			}
 		}
-		
+
 		return deaths;
 	}
-	
 
-	public String toString()
-	{
+	public int heuristicCost1() {
+
+		int deaths = this.death * 2;
+		int kills = this.killed * 100;
+		int c = (kills + deaths) / 3;
+		int Neox = this.position.x;
+		int Neoy = this.position.y;
+		String[] tb = Matrix.telephonebooth().split(",");
+		int tbx = (Integer.parseInt(tb[1]));
+		int tby = (Integer.parseInt(tb[0]));
+
+		int p = Math.abs(Neox - tbx) + Math.abs(Neoy - tby);
+
+		if (SearchProblem.getGoalTest() == true && p == 0) {
+			return 0;
+		} else {
+			return c;
+		}
+	}
+
+	public int heuristicCost2() {
+
+		int deaths = this.death * 2;
+		int kills = this.killed * 100;
+		int c = (kills + deaths) / 8;
+		int Neox = this.position.x;
+		int Neoy = this.position.y;
+		String[] tb = Matrix.telephonebooth().split(",");
+		int tbx = (Integer.parseInt(tb[1]));
+		int tby = (Integer.parseInt(tb[0]));
+
+		int p = Math.abs(Neox - tbx) + Math.abs(Neoy - tby);
+
+		if (SearchProblem.getGoalTest() == true && p == 0) {
+			return 0;
+		} else {
+			return c;
+		}
+	}
+
+	public String toString() {
 		String value = "";
-		value +=  "Position: (" + position.x + "," + position.y + ")" ;
+		value += "Position: (" + position.x + "," + position.y + ")";
+//		value +=  carried.size() + "," + agents.size() + "," + pills.size() + "," + pads.size() + "," + hostages.size();
 
-		for(int i=0; i<carried.size();i++){
-			value += " Carried: (" +carried.get(i).position.x + "," + carried.get(i).position.y + "," + carried.get(i).isSaved + "," + carried.get(i).isDead + ") ";
+//		value +=  -1 + "," + -1 + ",";
+
+		for (int i = 0; i < carried.size(); i++) {
+			// if(positions.get(i).x == -1)
+			// value += ";";
+			value += " Carried: (" + carried.get(i).position.x + "," + carried.get(i).position.y + ","
+					+ carried.get(i).isSaved + "," + carried.get(i).isDead + ") ";
 		}
+//		value +=  -1 + "," + -1 + ",";
 
-		for(int i=0; i<hostages.size();i++){
-			value += " Hostage: (" + hostages.get(i).position.x + "," + hostages.get(i).position.y + "," + hostages.get(i).isAgent + "," + hostages.get(i).isSaved + "," + hostages.get(i).isDead + ") ";
+		for (int i = 0; i < hostages.size(); i++) {
+			// if(positions.get(i).x == -1)
+			// value += ";";
+			value += " Hostage: (" + hostages.get(i).position.x + "," + hostages.get(i).position.y + ","
+					+ hostages.get(i).isAgent + "," + hostages.get(i).isSaved + "," + hostages.get(i).isDead + ") ";
 		}
+//		value +=  -1 + "," + -1 + ",";
 
-		for(int i=0; i<agents.size();i++){
+		for (int i = 0; i < agents.size(); i++) {
+			// if(positions.get(i).x == -1)
+			// value += ";";
 			value += "Agent: (" + agents.get(i).x + "," + agents.get(i).y + ") ";
 		}
+//		value +=  -1 + "," + -1 + ",";
 
-		for(int i=0; i<pills.size();i++){
+		for (int i = 0; i < pills.size(); i++) {
+			// if(positions.get(i).x == -1)
+			// value += ";";
 			value += "Pill: (" + pills.get(i).x + "," + pills.get(i).y + ") ";
 		}
+//		value +=  -1 + "," + -1 + ",";
 
-		for(int i=0; i<pads.size();i++){
+		for (int i = 0; i < pads.size(); i++) {
+			// if(positions.get(i).x == -1)
+			// value += ";";
 			value += "Pad: (" + pads.get(i).getStartPad().x + "," + pads.get(i).getStartPad().y + ")";
 			value += "(" + pads.get(i).getEndPad().x + "," + pads.get(i).getEndPad().y + ") ";
 
 		}
 		value += damage;
+//		value +=   prev.x + "," + prev.y ;
 		return value;
 	}
-	
-	public String visualizeString()
-	{
+
+	public String visualizeString() {
 		String value = "";
-		value += "Killed: " + killed; 
-		value +=  " Position: (" + position.x + "," + position.y + "," + damage + ")" ;
+		value += "Killed: " + killed;
+		value += " Position: (" + position.x + "," + position.y + "," + damage + ")";
+//		value +=  carried.size() + "," + agents.size() + "," + pills.size() + "," + pads.size() + "," + hostages.size();
 
-		for(int i=0; i<carried.size();i++){
-			value += " Carried: (" +carried.get(i).position.x + "," + carried.get(i).position.y + "," + carried.get(i).damage + "," + carried.get(i).isAgent + "," + carried.get(i).isDead;
-		}
+//		value +=  -1 + "," + -1 + ",";
 
-		for(int i=0; i<hostages.size();i++){
-			value += " Hostage: (" + hostages.get(i).position.x + "," + hostages.get(i).position.y + "," + hostages.get(i).damage + "," + hostages.get(i).isAgent + "," + hostages.get(i).isDead;
+		for (int i = 0; i < carried.size(); i++) {
+			// if(positions.get(i).x == -1)
+			// value += ";";
+			value += " Carried: (" + carried.get(i).position.x + "," + carried.get(i).position.y + ","
+					+ carried.get(i).damage + "," + carried.get(i).isAgent + "," + carried.get(i).isDead;
 		}
-		
-		for(int i=0; i<agents.size();i++){
+//		value +=  -1 + "," + -1 + ",";
+
+		for (int i = 0; i < hostages.size(); i++) {
+			// if(positions.get(i).x == -1)
+			// value += ";";
+			value += " Hostage: (" + hostages.get(i).position.x + "," + hostages.get(i).position.y + ","
+					+ hostages.get(i).damage + "," + hostages.get(i).isAgent + "," + hostages.get(i).isDead;
+		}
+//		value +=  -1 + "," + -1 + ",";
+
+		for (int i = 0; i < agents.size(); i++) {
+			// if(positions.get(i).x == -1)
+			// value += ";";
 			value += "Agent: (" + agents.get(i).x + "," + agents.get(i).y + ") ";
 		}
+//		value +=  -1 + "," + -1 + ",";
 
-		for(int i=0; i<pills.size();i++){
+		for (int i = 0; i < pills.size(); i++) {
+			// if(positions.get(i).x == -1)
+			// value += ";";
 			value += "Pill: (" + pills.get(i).x + "," + pills.get(i).y + ") ";
 		}
+//		value +=  -1 + "," + -1 + ",";
 
-		for(int i=0; i<pads.size();i++){
+		for (int i = 0; i < pads.size(); i++) {
+			// if(positions.get(i).x == -1)
+			// value += ";";
 			value += "Pad: (" + pads.get(i).getStartPad().x + "," + pads.get(i).getStartPad().y + ")";
 			value += "(" + pads.get(i).getEndPad().x + "," + pads.get(i).getEndPad().y + ") ";
 
 		}
-		
+
+//		value +=   prev.x + "," + prev.y ;
 		return value;
 	}
 
@@ -204,6 +311,14 @@ public class NeoState extends State {
 
 	public void setDeath(int death) {
 		this.death = death;
+	}
+
+	public Point getPrev() {
+		return prev;
+	}
+
+	public void setPrev(Point prev) {
+		this.prev = prev;
 	}
 
 	public void setPosition(Point position) {
