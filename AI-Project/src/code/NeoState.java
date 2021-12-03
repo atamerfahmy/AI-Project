@@ -13,10 +13,9 @@ public class NeoState extends State {
 	ArrayList<Hostage> hostages;
 	int killed;
 	int death;
-	Point prev;
 	int hostagesCount;
 	
-	public NeoState(Point position, ArrayList<Hostage> carried, ArrayList<Point> agents, ArrayList<Point> pills, ArrayList<Pad> pads, ArrayList<Hostage> hostages, int damage, int killed, int death, Point prev, int hostagesCount) {
+	public NeoState(Point position, ArrayList<Hostage> carried, ArrayList<Point> agents, ArrayList<Point> pills, ArrayList<Pad> pads, ArrayList<Hostage> hostages, int damage, int killed, int death, int hostagesCount) {
 		
 		super();
 		this.position = position;
@@ -29,15 +28,10 @@ public class NeoState extends State {
 		this.damage = damage;
 		this.killed = killed;
 		this.death = death;
-		this.prev = prev;
 		this.hostagesCount = hostagesCount;
 	}
 	
 	public Point getPosition() {
-//		System.out.println(this.positions.get(this.positions.size()-1));
-//		for(Point x: positions) {
-//			System.out.println(x.x + " " + x.y);
-//		}
 		return this.position;
 	}
 	 
@@ -52,8 +46,6 @@ public class NeoState extends State {
 					hostages.get(i).isAgent = true;
 				}else {
 					hostages.get(i).isDead = true;
-//					hostages.remove(i);
-//					i--;
 				}
 			}
 			else if(hostage.damage + damage < 0 && !hostage.isAgent && !hostage.isDead && !hostage.isSaved) {
@@ -62,18 +54,6 @@ public class NeoState extends State {
 			else if (!hostage.isAgent && !hostage.isDead && !hostage.isSaved) {
 				
 				hostages.get(i).damage += damage;
-				
-//				if(hostages.get(i).damage >= 100) {
-//					if(!hostage.isCarried) {
-//						hostages.get(i).isAgent = true;
-//					}else {
-//						hostages.get(i).isDead = true;
-//					}
-//				}
-//			}else if(hostage.isDead) {
-//				if(hostages.get(i).damage + damage < 100) {
-//					hostages.get(i).isDead = false;
-//				}
 			}
 		}
 		
@@ -105,47 +85,29 @@ public class NeoState extends State {
 	{
 		String value = "";
 		value +=  "Position: (" + position.x + "," + position.y + ")" ;
-//		value +=  carried.size() + "," + agents.size() + "," + pills.size() + "," + pads.size() + "," + hostages.size();
-
-//		value +=  -1 + "," + -1 + ",";
 
 		for(int i=0; i<carried.size();i++){
-			//if(positions.get(i).x == -1)
-				//value += ";";
 			value += " Carried: (" +carried.get(i).position.x + "," + carried.get(i).position.y + "," + carried.get(i).isSaved + "," + carried.get(i).isDead + ") ";
 		}
-//		value +=  -1 + "," + -1 + ",";
 
 		for(int i=0; i<hostages.size();i++){
-			//if(positions.get(i).x == -1)
-				//value += ";";
 			value += " Hostage: (" + hostages.get(i).position.x + "," + hostages.get(i).position.y + "," + hostages.get(i).isAgent + "," + hostages.get(i).isSaved + "," + hostages.get(i).isDead + ") ";
 		}
-//		value +=  -1 + "," + -1 + ",";
 
 		for(int i=0; i<agents.size();i++){
-			//if(positions.get(i).x == -1)
-				//value += ";";
 			value += "Agent: (" + agents.get(i).x + "," + agents.get(i).y + ") ";
 		}
-//		value +=  -1 + "," + -1 + ",";
 
 		for(int i=0; i<pills.size();i++){
-			//if(positions.get(i).x == -1)
-				//value += ";";
 			value += "Pill: (" + pills.get(i).x + "," + pills.get(i).y + ") ";
 		}
-//		value +=  -1 + "," + -1 + ",";
 
 		for(int i=0; i<pads.size();i++){
-			//if(positions.get(i).x == -1)
-				//value += ";";
 			value += "Pad: (" + pads.get(i).getStartPad().x + "," + pads.get(i).getStartPad().y + ")";
 			value += "(" + pads.get(i).getEndPad().x + "," + pads.get(i).getEndPad().y + ") ";
 
 		}
 		value += damage;
-//		value +=   prev.x + "," + prev.y ;
 		return value;
 	}
 	
@@ -154,47 +116,29 @@ public class NeoState extends State {
 		String value = "";
 		value += "Killed: " + killed; 
 		value +=  " Position: (" + position.x + "," + position.y + "," + damage + ")" ;
-//		value +=  carried.size() + "," + agents.size() + "," + pills.size() + "," + pads.size() + "," + hostages.size();
-
-//		value +=  -1 + "," + -1 + ",";
 
 		for(int i=0; i<carried.size();i++){
-			//if(positions.get(i).x == -1)
-				//value += ";";
 			value += " Carried: (" +carried.get(i).position.x + "," + carried.get(i).position.y + "," + carried.get(i).damage + "," + carried.get(i).isAgent + "," + carried.get(i).isDead;
 		}
-//		value +=  -1 + "," + -1 + ",";
 
 		for(int i=0; i<hostages.size();i++){
-			//if(positions.get(i).x == -1)
-				//value += ";";
 			value += " Hostage: (" + hostages.get(i).position.x + "," + hostages.get(i).position.y + "," + hostages.get(i).damage + "," + hostages.get(i).isAgent + "," + hostages.get(i).isDead;
 		}
-//		value +=  -1 + "," + -1 + ",";
-
+		
 		for(int i=0; i<agents.size();i++){
-			//if(positions.get(i).x == -1)
-				//value += ";";
 			value += "Agent: (" + agents.get(i).x + "," + agents.get(i).y + ") ";
 		}
-//		value +=  -1 + "," + -1 + ",";
 
 		for(int i=0; i<pills.size();i++){
-			//if(positions.get(i).x == -1)
-				//value += ";";
 			value += "Pill: (" + pills.get(i).x + "," + pills.get(i).y + ") ";
 		}
-//		value +=  -1 + "," + -1 + ",";
 
 		for(int i=0; i<pads.size();i++){
-			//if(positions.get(i).x == -1)
-				//value += ";";
 			value += "Pad: (" + pads.get(i).getStartPad().x + "," + pads.get(i).getStartPad().y + ")";
 			value += "(" + pads.get(i).getEndPad().x + "," + pads.get(i).getEndPad().y + ") ";
 
 		}
 		
-//		value +=   prev.x + "," + prev.y ;
 		return value;
 	}
 
@@ -260,14 +204,6 @@ public class NeoState extends State {
 
 	public void setDeath(int death) {
 		this.death = death;
-	}
-
-	public Point getPrev() {
-		return prev;
-	}
-
-	public void setPrev(Point prev) {
-		this.prev = prev;
 	}
 
 	public void setPosition(Point position) {

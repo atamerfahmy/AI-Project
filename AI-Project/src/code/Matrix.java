@@ -55,19 +55,11 @@ public class Matrix extends SearchProblem {
 					Integer.parseInt(g8[i + 2]), false, false, false, false));
 		}
 
-		initialState = new NeoState(Neo, new ArrayList<Hostage>(), agents, pills, pads, hostages, 0, 0, 0, Neo,
+		initialState = new NeoState(Neo, new ArrayList<Hostage>(), agents, pills, pads, hostages, 0, 0, 0,
 				hostages.size());
 		operators = new String[] { "up", "down", "right", "left", "carry", "drop", "kill", "takePill", "fly" };
 
 	}
-
-//	public boolean agentCollision() {
-//		for (int i = 0; i < agents.size(); i++) {
-//			if (Neo.x == agents.get(i).x && Neo.y == agents.get(i).y)
-//				return true;
-//		}
-//		return false;
-//	}
 
 	@SuppressWarnings("unchecked")
 	public State transitionFunction(State state, String operator) {
@@ -102,28 +94,12 @@ public class Matrix extends SearchProblem {
 		}
 
 		Point neoCurrentPosition = new Point(neoState.getPosition());
-//		ArrayList<Hostage> carried = (ArrayList<Hostage>) neoState.getCarried().clone();
-//		ArrayList<Point> agents = (ArrayList<Point>) neoState.getAgents().clone();
-//		ArrayList<Point> pills = (ArrayList<Point>) neoState.getPills().clone();
-//		ArrayList<Pad> pads = (ArrayList<Pad>) neoState.getPads().clone();
-//		ArrayList<Hostage> hostages = (ArrayList<Hostage>) neoState.getHostages().clone();
 
 		int damage = neoState.getDamage();
 		int killed = neoState.getKilled();
 		int death = neoState.getDeath();
-		Point prev = new Point(neoState.getPrev());
 		int hostagesCount = neoState.getHostagesCount();
 
-//		hostages = NeoState.addDamageToHostages(hostages, 2);
-//		carried = NeoState.addDamageToHostages(carried, 2);
-
-//		for(Hostage x: hostages) {
-//			if(x.isAgent) {
-//				System.out.println(x.position.x + "," + x.position.y);
-//			}
-//		}
-
-//		System.out.println(death);
 		switch (operator) {
 		case "up": {
 			Point topAdj = new Point(neoCurrentPosition.x - 1, neoCurrentPosition.y);
@@ -132,7 +108,7 @@ public class Matrix extends SearchProblem {
 				hostages = NeoState.addDamageToHostages(hostages, 2);
 				carried = NeoState.addDamageToHostages(carried, 2);
 				State newState = new NeoState(topAdj, carried, agents, pills, pads, hostages, damage, killed, death,
-						neoCurrentPosition, hostagesCount);
+						hostagesCount);
 				if (states.containsKey(newState.toString())) {
 					return null;
 				}
@@ -150,19 +126,12 @@ public class Matrix extends SearchProblem {
 			Point downAdj = new Point(neoCurrentPosition.x + 1, neoCurrentPosition.y);
 
 			if (downAdj.x < rows && !agentCollision(agents, hostages, downAdj)) {
-//				neoState.positions.add(downAdj);
-//				if(count == 26) {
-//					System.out.println("HERE");
-//				}
 				hostages = NeoState.addDamageToHostages(hostages, 2);
 				carried = NeoState.addDamageToHostages(carried, 2);
 				State newState = new NeoState(downAdj, carried, agents, pills, pads, hostages, damage, killed, death,
-						neoCurrentPosition, hostagesCount);
+						hostagesCount);
 
 				if (states.containsKey(newState.toString())) {
-					if (count == 26) {
-						System.out.println("HERE2");
-					}
 					return null;
 				}
 				states.put(newState.toString(), "");
@@ -183,7 +152,7 @@ public class Matrix extends SearchProblem {
 				hostages = NeoState.addDamageToHostages(hostages, 2);
 				carried = NeoState.addDamageToHostages(carried, 2);
 				State newState = new NeoState(leftAdj, carried, agents, pills, pads, hostages, damage, killed, death,
-						neoCurrentPosition, hostagesCount);
+					hostagesCount);
 
 				if (states.containsKey(newState.toString())) {
 					return null;
@@ -206,7 +175,7 @@ public class Matrix extends SearchProblem {
 				hostages = NeoState.addDamageToHostages(hostages, 2);
 				carried = NeoState.addDamageToHostages(carried, 2);
 				State newState = new NeoState(rightAdj, carried, agents, pills, pads, hostages, damage, killed, death,
-						neoCurrentPosition, hostagesCount);
+						hostagesCount);
 
 				if (states.containsKey(newState.toString())) {
 					return null;
@@ -234,13 +203,11 @@ public class Matrix extends SearchProblem {
 			}
 
 			if (flyTo != null) {
-//				System.out.println("FLY");
-
 				hostages = NeoState.addDamageToHostages(hostages, 2);
 				carried = NeoState.addDamageToHostages(carried, 2);
 
 				State newState = new NeoState(flyTo, carried, agents, pills, pads, hostages, damage, killed, death,
-						neoCurrentPosition, hostagesCount);
+						hostagesCount);
 				if (states.containsKey(newState.toString())) {
 					return null;
 				}
@@ -256,8 +223,6 @@ public class Matrix extends SearchProblem {
 
 		}
 		case "kill": {
-
-//			ArrayList<Hostage> agentsTemp = new ArrayList<Hostage>();
 			Hostage hasHostage = null;
 			for (Hostage h : (ArrayList<Hostage>) hostages.clone()) {
 				hasHostage = h;
@@ -328,14 +293,12 @@ public class Matrix extends SearchProblem {
 			for (int i = 0; i < hostages.size(); i++) {
 				if (hostages.get(i).isAgent && !hostages.get(i).isCarried && !hostages.get(i).isDead
 						&& !hostages.get(i).isSaved) {
-//					System.out.println(hostages.get(i).position.x + "," + hostages.get(i).position.y);
 					if (neoCurrentPosition.x - 1 == hostages.get(i).position.x
 							&& neoCurrentPosition.y == hostages.get(i).position.y) // adjacent
 					{
 						if (hasHostage != null && hasHostage.damage >= 98) {
 							continue;
 						}
-//						hostTemp.remove(hostages.get(i));
 						hostTemp.get(i).isDead = true;
 						hasKilled = true;
 						killed++;
@@ -348,7 +311,6 @@ public class Matrix extends SearchProblem {
 						if (hasHostage != null && hasHostage.damage >= 98) {
 							continue;
 						}
-//						hostTemp.remove(hostages.get(i));
 						hostTemp.get(i).isDead = true;
 
 						hasKilled = true;
@@ -362,7 +324,6 @@ public class Matrix extends SearchProblem {
 						if (hasHostage != null && hasHostage.damage >= 98) {
 							continue;
 						}
-//						hostTemp.remove(hostages.get(i));
 						hostTemp.get(i).isDead = true;
 
 						hasKilled = true;
@@ -376,7 +337,6 @@ public class Matrix extends SearchProblem {
 						if (hasHostage != null && hasHostage.damage >= 98) {
 							continue;
 						}
-//						hostTemp.remove(hostages.get(i));
 						hostTemp.get(i).isDead = true;
 						hasKilled = true;
 						killed++;
@@ -392,7 +352,7 @@ public class Matrix extends SearchProblem {
 				hostTemp = NeoState.addDamageToHostages(hostTemp, 2);
 				carried = NeoState.addDamageToHostages(carried, 2);
 				State newState = new NeoState(neoCurrentPosition, carried, agents, pills, pads, hostTemp, newDamage,
-						killed, death, prev, hostagesCount);
+						killed, death, hostagesCount);
 				if (states.containsKey(newState.toString())) {
 					return null;
 				}
@@ -429,7 +389,7 @@ public class Matrix extends SearchProblem {
 				carried = NeoState.addDamageToHostages(carried, 2);
 
 				State newState = new NeoState(neoCurrentPosition, carried, agents, pills, pads, hostages, damage,
-						killed, death, prev, hostagesCount);
+						killed, death, hostagesCount);
 				if (states.containsKey(newState.toString())) {
 					return null;
 				}
@@ -447,14 +407,10 @@ public class Matrix extends SearchProblem {
 		case "drop": {
 
 			if (!carried.isEmpty() && neoCurrentPosition.x == Telephone.x && neoCurrentPosition.y == Telephone.y) {
-//				carried = NeoState.addDamageToHostages(carried, -2);
-//				death = NeoState.calcDeaths(hostages, carried, hostagesCount);
-
 				for (int i = 0; i < carried.size(); i++) {
 
 					Hostage x = new Hostage(carried.get(i).getPosition(), carried.get(i).damage, false,
 							carried.get(i).isAgent, carried.get(i).isDead, carried.get(i).isSaved);
-//					x.isCarried = false;
 					if (!x.isDead) {
 						x.isSaved = true;
 					}
@@ -464,16 +420,13 @@ public class Matrix extends SearchProblem {
 				ArrayList<Hostage> newCarried = new ArrayList<Hostage>();
 
 				hostages = NeoState.addDamageToHostages(hostages, 2);
-//				carried = NeoState.addDamageToHostages(carried, 2);
 
 				State newState = new NeoState(neoCurrentPosition, newCarried, agents, pills, pads, hostages, damage,
-						killed, death, prev, hostagesCount);
+						killed, death, hostagesCount);
 
 				if (states.containsKey(newState.toString())) {
 					return null;
 				}
-//				System.out.println("DROP: " + hostages.size());
-				states.put(newState.toString(), "");
 //				if(count > 20) {
 //					System.out.print(count + " " + operator + " ");
 //					System.out.println(((NeoState) newState).visualizeString());
@@ -490,7 +443,6 @@ public class Matrix extends SearchProblem {
 			for (int i = 0; i < pills.size(); i++) {
 				if (pills.get(i).x == neoCurrentPosition.x && pills.get(i).y == neoCurrentPosition.y) {
 					pill = pills.get(i);
-//					pills.remove(i);
 					break;
 				}
 			}
@@ -499,11 +451,8 @@ public class Matrix extends SearchProblem {
 				ArrayList<Hostage> newHostages = NeoState.addDamageToHostages(hostages, -20);
 				ArrayList<Hostage> newCarried = NeoState.addDamageToHostages(carried, -20);
 
-//				ArrayList<Hostage> newHostages = NeoState.addDamageToHostages(hostages, -22);
-//				ArrayList<Hostage> newCarried = NeoState.addDamageToHostages(carried, -22);
-
 				State newState = new NeoState(neoCurrentPosition, newCarried, agents, new ArrayList<Point>(), pads,
-						newHostages, newDamage, killed, death, prev, hostagesCount);
+						newHostages, newDamage, killed, death, hostagesCount);
 
 				if (states.containsKey(newState.toString())) {
 					return null;
@@ -605,8 +554,17 @@ public class Matrix extends SearchProblem {
 		}
 		for (int i = 0; i < neoState.hostages.size(); i++) {
 			Hostage hostage = neoState.hostages.get(i);
-			if (hostage.getDamage() < 10)
-				grid[hostage.position.x][hostage.position.y] = "      HS (" + hostage.getDamage() + ")      ";
+			if (hostage.isDead && hostage.isAgent) {
+				grid[hostage.position.x][hostage.position.y] = "      HS (DEAD-A)      ";
+			}
+			else if(hostage.isAgent) {
+				grid[hostage.position.x][hostage.position.y] = "      HS (AGENT)      ";
+
+			} else if(hostage.isSaved && !hostage.isDead) {
+				grid[hostage.position.x][hostage.position.y] = "      HS (SAVED)      ";
+			}else if(hostage.isDead) {
+				grid[hostage.position.x][hostage.position.y] = "      HS (DEAD)      ";
+			}
 			else
 				grid[hostage.position.x][hostage.position.y] = "     HS (" + hostage.getDamage() + ")      ";
 		}
@@ -656,20 +614,6 @@ public class Matrix extends SearchProblem {
 		return false;
 	}
 
-	public static boolean padCollision(NeoState neoState, ArrayList<Pad> pads) {
-
-		for (Pad pad : pads) {
-			if (((pad.startPad.x == neoState.position.x && pad.startPad.y == neoState.position.y)
-					&& (pad.finishPad.x != neoState.prev.x && pad.finishPad.y != neoState.prev.y))
-					|| ((pad.finishPad.x == neoState.position.x && pad.finishPad.y == neoState.position.y)
-							&& (pad.startPad.x != neoState.prev.x && pad.startPad.y != neoState.prev.y))) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	public static boolean pillCollision(NeoState neoState, ArrayList<Point> pills) {
 
 		for (Point pill : pills) {
@@ -685,15 +629,8 @@ public class Matrix extends SearchProblem {
 
 		String grid = "5,5;2;0,4;1,4;0,1,1,1,2,1,3,1,3,3,3,4;1,0,2,4;0,3,4,3,4,3,0,3;0,0,30,3,0,80,4,4,80";
 
-		String s = solve(grid, "UC", true);
+		String s = solve(grid, "BF", true);
 		System.out.println(s);
-
-//		String grid = "5,5;2;0,4;1,4;0,1,1,1,2,1,3,1,3,3,3,4;1,0,2,4;0,3,4,3,4,3,0,3;0,0,30,3,0,80,4,4,80";
-//		Matrix e1 = new Matrix(grid);
-//		System.out.println(print(e1.agents));
-//		System.out.println(e1.pads);
-//		System.out.println(e1.);
-//		System.out.println(ir4);
 
 	}
 
@@ -704,11 +641,12 @@ public class Matrix extends SearchProblem {
 		String result = "";
 		int M = matrix.rows;
 		int N = matrix.columns;
-//		System.out.println(node);
 
 		if (node != null) {
 			NeoState neoState = ((NeoState) node.state);
-//			System.out.println(neoState.visualizeString());
+//			String IString=visualize(neoState, M, N, matrix.Telephone);
+//
+//			System.out.println(IString);
 //			int pathcost = node.pathCost;
 //			result += "snap";
 			int count = 0;
@@ -716,6 +654,7 @@ public class Matrix extends SearchProblem {
 				count++;
 				result = node.operator + "," + result;
 				if(visualize) {
+					System.out.println(node.operator);
 					String VString=visualize(node.state, M, N, matrix.Telephone);
 					System.out.println(VString);
 				}
@@ -723,14 +662,11 @@ public class Matrix extends SearchProblem {
 				node = node.parent;
 			}
 
-//			System.out.println(count);
 			result = result.substring(0, result.length() - 1);
 			result += ";" + neoState.death + ";" + neoState.killed + ";" + matrix.nodesExpanded;
 		} else {
 			result = "No Solution";
 		}
-
-		System.out.println(result);
 
 		return result;
 
